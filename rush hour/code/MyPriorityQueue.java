@@ -1,8 +1,5 @@
-import java.util.AbstractMap;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 public class MyPriorityQueue<T> {
 
@@ -15,11 +12,13 @@ public class MyPriorityQueue<T> {
 	  }
 
 	  public void enqueue(T item, float priority) {
-		  elements.add(new KeyValuePair(item, priority));
+		  elements.add(new KeyValuePair<T, Float>(item, priority));
 	  }
 	  public boolean contains(T item) {
+		 
 		  for (KeyValuePair<T, Float> keyValuePair : elements) {
 			if(keyValuePair.key.equals(item)) {
+			
 				return true;
 			}
 		  }
