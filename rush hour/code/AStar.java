@@ -1,6 +1,9 @@
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Dictionary;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 
@@ -39,12 +42,12 @@ public class AStar {
     }
     private void FindPath() {
     	
-    	int maxDepth = 0;
-    	int maxSearchDistance = 1000;
+//    	int maxDepth = 0;
+//    	int maxSearchDistance = 1000;
     	Node current = null;
     	addToOpen(startNode, heuristic.getValue(startNode.getState()));
     	addToCost(startNode, 0f);
-    	while((maxDepth < maxSearchDistance) && (open.size() != 0))
+    	while(open.size() != 0)//(maxDepth < maxSearchDistance) && 
     	{
     		current = getFirstInOpen();
     		if(current.getState().isGoal()) {
@@ -54,13 +57,10 @@ public class AStar {
     		addToClosed(current);
     		Node[] nextPossibleMoves= current.expand();
     		for(Node node : nextPossibleMoves) {
-    			//int heuristicValueCurrent = heuristic.getValue(current.getState());
     			int heuristicValueNext = heuristic.getValue(node.getState());
-    			//PriorityQueue
-    			float scoreCurrent = +heuristicValueNext+current.getDepth()+1;
+    			float scoreNext = +heuristicValueNext+node.getDepth();
     	
-//    			System.out.println("test " + inCostList(node.getState())  +" "+ scoreCurrent+" "+getCost(node.getState()));
-    			if(inCostList(node) && scoreCurrent < getCost(node)) {//TODO
+    			if(inCostList(node) && scoreNext < getCost(node)) {
     				if(inOpenList(node)) {
     					removeFromOpen(node);
     				}
@@ -69,29 +69,34 @@ public class AStar {
     				}
     			}
     			if(!inOpenList(node) && !inClosedList(node)) {
-    				maxDepth = Math.max(maxDepth, node.getDepth());
-    				//System.out.println("Add to cost" + node  + " "+scoreCurrent);
-    				addToCost(node, scoreCurrent);
-    				addToOpen(node, scoreCurrent);
+//    				maxDepth = Math.max(maxDepth, node.getDepth());
+    				addToCost(node, scoreNext);
+    				addToOpen(node, scoreNext);
     			}
     		}
     	}
     	//Solution found
     	if(current!=null) {
 	    	int cnt=0;
-	    	path= new State[current.getDepth()];
+	    	path = new State[current.getDepth()+1];
 	    	while(current.getParent()!=null) {
 	    		path[cnt] = current.getState();
 	    		cnt++;
 	    		current = current.getParent();
 	    	}
+	    	path[path.length-1]=current.getState();
+	    	ReversePath();
     	}
     	else {
     		path = null;
     	}
     	
     }
-    
+    private void ReversePath() {
+    	List<State> list = Arrays.asList(path);
+    	Collections.reverse(list);
+    	path = list.toArray(path);
+    }
     private void addToCost(Node node, Float cost)
     {
     	costSoFar.put(new NodeWithEqualsMethod(node), cost);

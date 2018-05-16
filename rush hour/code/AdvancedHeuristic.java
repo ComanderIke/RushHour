@@ -55,7 +55,7 @@ public class AdvancedHeuristic implements Heuristic {
 				}
 				else {
 					blockedCars.add(car);
-					blocks++;
+					//blocks++;
 					//vertical cars always block each other
 				}
     		}
@@ -78,7 +78,7 @@ public class AdvancedHeuristic implements Heuristic {
 					}
 				}
 				else {
-					blocks++;
+					//blocks++;
 					//horizontal cars always block each other
 				}
     		}
@@ -109,6 +109,8 @@ public class AdvancedHeuristic implements Heuristic {
     	return blocks;
     }
     public int getValue(State state) {
+    	if(state.isGoal())
+    		return 0;
     	ArrayList<Integer> blockedCars = new ArrayList<Integer>();
     	int blocks=0;
     	blocks = getBlocksGoalCar( state, blockedCars);
@@ -117,10 +119,10 @@ public class AdvancedHeuristic implements Heuristic {
     		blocks+=getBlocks(blockedCar, state, blockedCars2);
     	}
     	blockedCars.clear();
-    	for(Integer blockedCar : blockedCars2) {
-    		blocks+=getBlocks(blockedCar, state, blockedCars);
-    	}
-    	blockedCars2.clear();
+//    	for(Integer blockedCar : blockedCars2) {
+//    		blocks+=getBlocks(blockedCar, state, blockedCars);
+//    	}
+//    	blockedCars2.clear();
 //    	for(Integer blockedCar : blockedCars) {
 //    		blocks+=getBlocks(blockedCar, state, blockedCars2);
 //    	}
@@ -131,7 +133,7 @@ public class AdvancedHeuristic implements Heuristic {
 //    	blockedCars2.clear();
     	//System.out.println(blocks == 0 ? 0 : blocks + 1);
     	
-    	return blocks == 0 ? 0 : blocks + 1;
+    	return blocks + 1;
     }
 
 }
