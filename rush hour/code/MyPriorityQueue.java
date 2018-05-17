@@ -5,18 +5,18 @@ public class MyPriorityQueue<T> {
 
 	
 
-	  private List<KeyValuePair<T,Float>> elements = new LinkedList<KeyValuePair<T, Float>>();
+	  private List<KeyValuePair<T,Integer>> elements = new LinkedList<KeyValuePair<T, Integer>>();
 
 	  public int size() {
 	    return elements.size();
 	  }
 
-	  public void enqueue(T item, float priority) {
-		  elements.add(new KeyValuePair<T, Float>(item, priority));
+	  public void enqueue(T item, Integer priority) {
+		  elements.add(new KeyValuePair<T, Integer>(item, priority));
 	  }
 	  public boolean contains(T item) {
 		 
-		  for (KeyValuePair<T, Float> keyValuePair : elements) {
+		  for (KeyValuePair<T, Integer> keyValuePair : elements) {
 			if(keyValuePair.key.equals(item)) {
 			
 				return true;
@@ -25,9 +25,9 @@ public class MyPriorityQueue<T> {
 		  return false;
 	  }
 	  public void remove(T item) {
-		  KeyValuePair<T, Float> tmp=null;
+		  KeyValuePair<T, Integer> tmp=null;
 		  
-		  for (KeyValuePair<T, Float> keyValuePair : elements) {
+		  for (KeyValuePair<T, Integer> keyValuePair : elements) {
 				if(keyValuePair.key.equals(item)) {
 					tmp = keyValuePair;
 					break;

@@ -1,18 +1,18 @@
 
-public class NodeWithEqualsMethod {
+public class MyNode {
 
 	public Node node;
 	
-	public NodeWithEqualsMethod(Node n) {
+	public MyNode(Node n) {
 		this.node = n;
 	}
 	
 
 	@Override
     public boolean equals(Object o) {
-    	NodeWithEqualsMethod s;
+    	MyNode s;
     	try {
-    	    s = (NodeWithEqualsMethod) o;
+    	    s = (MyNode) o;
     	}
     	catch (ClassCastException e) {
     	    return false;

@@ -1,11 +1,9 @@
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.PriorityQueue;
 
 /**
  * This is the template for a class that performs A* search on a given
@@ -22,9 +20,9 @@ public class AStar {
 
     /** The solution path is stored here */
     public State[] path;
-    private ArrayList<NodeWithEqualsMethod> closed;
-    private MyPriorityQueue<NodeWithEqualsMethod> open;
-    Map<NodeWithEqualsMethod,Float> costSoFar;
+    private ArrayList<MyNode> closed;
+    private MyPriorityQueue<MyNode> open;
+    private Map<MyNode,Integer> costSoFar;
     private Heuristic heuristic;
     private Node startNode;
     /**
@@ -35,19 +33,17 @@ public class AStar {
     	
     	this.heuristic = heuristic;
     	startNode = puzzle.getInitNode();
-    	closed = new ArrayList<NodeWithEqualsMethod>();
-        open = new MyPriorityQueue<NodeWithEqualsMethod>();
-        costSoFar = new HashMap<NodeWithEqualsMethod,Float>();
+    	closed = new ArrayList<MyNode>();
+        open = new MyPriorityQueue<MyNode>();
+        costSoFar = new HashMap<MyNode,Integer>();
     	FindPath();
     }
+    
     private void FindPath() {
-    	
-//    	int maxDepth = 0;
-//    	int maxSearchDistance = 1000;
     	Node current = null;
-    	addToOpen(startNode, heuristic.getValue(startNode.getState()));
-    	addToCost(startNode, 0f);
-    	while(open.size() != 0)//(maxDepth < maxSearchDistance) && 
+    	addToOpen(startNode, 0);
+    	addToCost(startNode, 0);
+    	while(open.size() != 0)
     	{
     		current = getFirstInOpen();
     		if(current.getState().isGoal()) {
@@ -55,21 +51,17 @@ public class AStar {
     		}
     		removeFromOpen(current);
     		addToClosed(current);
-    		Node[] nextPossibleMoves= current.expand();
+    		Node[] nextPossibleMoves = current.expand();
     		for(Node node : nextPossibleMoves) {
     			int heuristicValueNext = heuristic.getValue(node.getState());
-    			float scoreNext = +heuristicValueNext+node.getDepth();
-    	
+    			int scoreNext = heuristicValueNext  + node.getDepth();
+    			
     			if(inCostList(node) && scoreNext < getCost(node)) {
     				if(inOpenList(node)) {
     					removeFromOpen(node);
     				}
-    				if(inClosedList(node)) {
-    					removeFromClosed(node);
-    				}
     			}
     			if(!inOpenList(node) && !inClosedList(node)) {
-//    				maxDepth = Math.max(maxDepth, node.getDepth());
     				addToCost(node, scoreNext);
     				addToOpen(node, scoreNext);
     			}
@@ -97,50 +89,50 @@ public class AStar {
     	Collections.reverse(list);
     	path = list.toArray(path);
     }
-    private void addToCost(Node node, Float cost)
+    
+    private void addToCost(Node node, Integer cost)
     {
-    	costSoFar.put(new NodeWithEqualsMethod(node), cost);
+    	costSoFar.put(new MyNode(node), cost);
     }
     private boolean inCostList(Node node)
     {
-        return costSoFar.containsKey(new NodeWithEqualsMethod(node));
+        return costSoFar.containsKey(new MyNode(node));
     }
-    private Float getCost(Node node) {
-    	return costSoFar.get(new NodeWithEqualsMethod(node));
+    private Integer getCost(Node node) {
+    	return costSoFar.get(new MyNode(node));
     }
     
     
     private void addToClosed(Node node)
     {
-        closed.add(new NodeWithEqualsMethod(node));
+        closed.add(new MyNode(node));
     }
     
     private boolean inClosedList(Node node)
     {
-        return closed.contains(new NodeWithEqualsMethod(node));
+        return closed.contains(new MyNode(node));
     }
     
     private void removeFromClosed(Node node)
     {
-        closed.remove(new NodeWithEqualsMethod(node));
+        closed.remove(new MyNode(node));
     }
     
-    private void addToOpen(Node node, float priority)
+    private void addToOpen(Node node, Integer priority)
     {
-        open.enqueue(new NodeWithEqualsMethod(node), priority);
+        open.enqueue(new MyNode(node), priority);
     }
     private boolean inOpenList(Node node)
     {
-        return open.contains(new NodeWithEqualsMethod(node));
+        return open.contains(new MyNode(node));
     }
-    
     private Node getFirstInOpen()
     {
         return open.dequeue().node;
     }
     private void removeFromOpen(Node node)
     {
-        open.remove(new NodeWithEqualsMethod(node));
+        open.remove(new MyNode(node));
     }
     
 }

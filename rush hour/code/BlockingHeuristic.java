@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 /**
  * This is a template for the class corresponding to the blocking
  * heuristic.  This heuristic returns zero for goal states, and
@@ -42,38 +44,35 @@ public class BlockingHeuristic implements Heuristic {
      * This method returns the value of the heuristic function at the
      * given state.
      */
-    private boolean isBlockingCar(int blockingCarIndex, State state) {
-        return this.puzzle.getCarOrient(blockingCarIndex) && // only vertical aligned cars are blocking
-                this.puzzle.getFixedPosition(blockingCarIndex) > (state.getVariablePosition(0) + this.carSizes[goalCar] - 1) && // check if car is behind ours (horizontal)
-                this.carFPos[goalCar] >= state.getVariablePosition(blockingCarIndex) && // check if car is between ours (vertical)
-                this.carFPos[goalCar] <= (state.getVariablePosition(blockingCarIndex) + this.puzzle.getCarSize(blockingCarIndex) - 1); // check if car is between ours (vertical)
+//    private boolean isBlockingCar(int blockingCarIndex, State state) {
+//        return this.puzzle.getCarOrient(blockingCarIndex) && // only vertical aligned cars are blocking
+//                this.puzzle.getFixedPosition(blockingCarIndex) > (state.getVariablePosition(0) + this.carSizes[goalCar] - 1) && // check if car is behind ours (horizontal)
+//                this.carFPos[goalCar] >= state.getVariablePosition(blockingCarIndex) && // check if car is between ours (vertical)
+//                this.carFPos[goalCar] <= (state.getVariablePosition(blockingCarIndex) + this.puzzle.getCarSize(blockingCarIndex) - 1); // check if car is between ours (vertical)
+//    }
+    public int getCarsBlockingGoal(State state) {
+    	int blocks=0;
+    	for(int car = 1; car < numCars; car++) {
+    		if(carOrient[car]) {
+    			if(carFPos[car] > state.getVariablePosition(goalCar) + (carSizes[goalCar]-1)) {
+    				int min = state.getVariablePosition(car);
+    				int max = min + (carSizes[car]-1);
+    				for( int i = min; i <= max; i++) {
+    					if(carFPos[goalCar]==i) {
+    						blocks++;
+    						break;
+    					}
+    				}
+    			}
+    		}
+    	}
+    	return blocks;
     }
     public int getValue(State state) {
     	int blocks=0;
     	if(state.isGoal())
     		return 0;
-    	for(int car = 1; car < numCars; car++) {
-    		if(isBlockingCar(car,state))
-    			blocks++;
-//    		if(carOrient[car]) {
-//    			if(carFPos[car] > state.getVariablePosition(goalCar) + (carSizes[goalCar]-1)) {
-////    				int min = state.getVariablePosition(car);
-////    				int max = min + (carSizes[car]-1);
-////    				for( int i = min; i <= max; i++) {
-////    					if(carFPos[goalCar]==i) {
-////    						blocks++;
-////    						i=max+1;
-////    					}
-////    				}
-//    				if(carFPos[goalCar] >= state.getVariablePosition(car) && carFPos[goalCar] < state.getVariablePosition(car) + carSizes[car]){
-//    					blocks++;
-//    				}
-//    			}
-//    		}
-//    		else {
-//    			//horizontals cant block otherwise impossible puzzle 
-//    		}
-    	}
+    	blocks = getCarsBlockingGoal(state);
     	
     	return blocks + 1;
 	// your code here

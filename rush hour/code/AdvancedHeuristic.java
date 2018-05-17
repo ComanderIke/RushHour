@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This is a template for the class corresponding to your original
@@ -15,6 +16,7 @@ public class AdvancedHeuristic implements Heuristic {
 	int [] carFPos;
 	int gridSize;
 	int goalCar;
+	List<Integer> blockingCars;
 	
     public AdvancedHeuristic(Puzzle puzzle) {
     	numCars=puzzle.getNumCars();
@@ -28,111 +30,96 @@ public class AdvancedHeuristic implements Heuristic {
 			carOrient[car]=puzzle.getCarOrient(car);
 			carSizes[car]=puzzle.getCarSize(car);
 			carFPos[car] = puzzle.getFixedPosition(car);
-			
 		}
-
     }
 	
     /**
      * This method returns the value of the heuristic function at the
      * given state.
      */
-    public int getBlocks(int blockedCar, State state, ArrayList<Integer>blockedCars) {
-    	int blocks=0;
+    public int  getCarsBlockingCar(int blockedCar, State state) {
+    	int blocks = 0;
     	boolean blockedCarOrient = carOrient[blockedCar];
-    	if(blockedCarOrient) {
-    		for(int car = 1; car < numCars; car++) {
+    	if(blockedCarOrient) {//blockedCar is vertical
+    		for(int car = 1; car < numCars; car++) {//start with 1 because 0 is the goalcar
+    			if(car==blockedCar)
+    				continue;
 				if(!carOrient[car]) {
 					int min = state.getVariablePosition(car);
 					int max = min + (carSizes[car]-1);
 					for( int i = min; i <= max; i++) {
-						if(carFPos[blockedCar]==i) {
-							blockedCars.add(car);
+						if(carFPos[blockedCar]==i&&!blockingCars.contains(car)) {
+							blockingCars.add(car);
 							blocks++;
-							i=max+1;
+							break;
 						}
 					}
 				}
 				else {
-					blockedCars.add(car);
-					//blocks++;
-					//vertical cars always block each other
+					// we assume cars with same orientation dont block each other 
+					// unless they have the same FPos! in that case we can't do anything about it
 				}
     		}
     	}
-    	else {
+    	else {//blockedCar is horizontal
     		for(int car = 1; car < numCars; car++) {
-        		
+    			if(car==blockedCar)
+    				continue;
 				if(carOrient[car]) {
-					//System.out.println("Car: "+car);
 					if(carFPos[car] > state.getVariablePosition(blockedCar) + (carSizes[blockedCar]-1)) {
 						int min = state.getVariablePosition(car);
 						int max = min + (carSizes[car]-1);
 						for( int i = min; i <= max; i++) {
-							if(carFPos[blockedCar]==i) {
-								//blockedCars.add(car);
+							if(carFPos[blockedCar]==i&&!blockingCars.contains(car)) {
+								blockingCars.add(car);
 								blocks++;
-								i=max+1;
+								break;
 							}
 						}
 					}
 				}
 				else {
-					//blocks++;
-					//horizontal cars always block each other
+					// we assume cars with same orientation dont block each other 
+					// unless they have the same FPos! in that case we can't do anything about it
+					
 				}
     		}
     	}
     	return blocks;
     }
-    public int getBlocksGoalCar(State state, ArrayList<Integer> blockedCars) {
+
+    public int getCarsBlockingGoal(State state) {
     	int blocks=0;
     	for(int car = 1; car < numCars; car++) {
     		if(carOrient[car]) {
-    			//System.out.println("Car: "+car);
     			if(carFPos[car] > state.getVariablePosition(goalCar) + (carSizes[goalCar]-1)) {
     				int min = state.getVariablePosition(car);
     				int max = min + (carSizes[car]-1);
     				for( int i = min; i <= max; i++) {
-    					if(carFPos[goalCar]==i) {
-    						blockedCars.add(car);
+    					if(carFPos[goalCar]==i&& !blockingCars.contains(car)) {
+    						blockingCars.add(car);
     						blocks++;
-    						i=max+1;
+    						break;
     					}
     				}
     			}
     		}
-    		else {
-    			//horizontals cant block otherwise impossible puzzle 
-    		}
     	}
     	return blocks;
     }
+    
     public int getValue(State state) {
+    	
     	if(state.isGoal())
     		return 0;
-    	ArrayList<Integer> blockedCars = new ArrayList<Integer>();
+    	blockingCars = new ArrayList<Integer>();
     	int blocks=0;
-    	blocks = getBlocksGoalCar( state, blockedCars);
-    	ArrayList<Integer> blockedCars2 = new ArrayList<Integer>();
+    	blocks = getCarsBlockingGoal(state);
+    	List<Integer>blockedCars=new ArrayList<Integer>(blockingCars);
     	for(Integer blockedCar : blockedCars) {
-    		blocks+=getBlocks(blockedCar, state, blockedCars2);
+    		blocks += getCarsBlockingCar(blockedCar, state);
     	}
-    	blockedCars.clear();
-//    	for(Integer blockedCar : blockedCars2) {
-//    		blocks+=getBlocks(blockedCar, state, blockedCars);
-//    	}
-//    	blockedCars2.clear();
-//    	for(Integer blockedCar : blockedCars) {
-//    		blocks+=getBlocks(blockedCar, state, blockedCars2);
-//    	}
-//    	blockedCars.clear();
-//    	for(Integer blockedCar : blockedCars2) {
-//    		blocks+=getBlocks(blockedCar, state, blockedCars);
-//    	}
-//    	blockedCars2.clear();
-    	//System.out.println(blocks == 0 ? 0 : blocks + 1);
-    	
+
     	return blocks + 1;
     }
 
